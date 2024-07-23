@@ -194,7 +194,7 @@ class Train():
                                     max_classes_num=config.classifier_train_max_classes_num,
                                     min_images_num=config.classifier_train_one_class_min_img_num,
                                     max_images_num=config.classifier_train_one_class_max_img_num,
-                                    allow_reshape=False)
+                                    allow_reshape=True)
         except Exception as e:
             log.e("train datasets not valid: {}".format(e))
             raise Exception((TrainFailReason.ERROR_PARAM, "datasets not valid: {}".format(str(e))))
@@ -263,7 +263,7 @@ class Train():
                                 max_classes_limit = config.detector_train_max_classes_num,
                                 one_class_min_images_num=config.detector_train_one_class_min_img_num,
                                 one_class_max_images_num=config.detector_train_one_class_max_img_num,
-                                allow_reshape = False)
+                                allow_reshape = True)
         except Exception as e:
             log.e("train datasets not valid: {}".format(e))
             raise Exception((TrainFailReason.ERROR_PARAM, "datasets not valid: {}".format(str(e))))
@@ -365,7 +365,18 @@ class Train():
         return False, f"output:\n{output}\nerror:\n{err}"
 
 if __name__ == "__main__":
-    # train_task = Train(TrainType.CLASSIFIER,  "../datasets/test_classifier_datasets.zip", "", "../out")
+    # 训练
     train_task = Train(TrainType.DETECTOR,  "../datasets/test_detector_xml_format.zip", "", "../out")
     train_task.train()
+    #
+    # # tflite 转 kmodel
+    # train_task = Train(TrainType.CLASSIFIER,
+    #                    datasets_zip="",
+    #                    dataset_dir=r'E:\maix_train\datasets\shell_or_not',
+    #                    out_dir="../out")
+    # print(f'{config.ncc_kmodel_v3}')
+    # train_task.convert_to_kmodel(r"E:\maix_train\out\m.tflite",
+    #                              r"E:\maix_train\out\m.kmodel",
+    #                              config.ncc_kmodel_v3, train_task.dataset_sample_images_path)
+
 

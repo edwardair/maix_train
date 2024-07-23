@@ -28,8 +28,8 @@ import random
 
 
 class Classifier(Train_Base):
-    def __init__(self, input_shape=(224, 224, 3), datasets_dir=None, datasets_zip=None, unpack_dir=None, logger = None,
-                max_classes_num=15, min_images_num=40, max_images_num=2000, allow_reshape = False):
+    def __init__(self, input_shape=(240, 320, 3), datasets_dir=None, datasets_zip=None, unpack_dir=None, logger = None,
+                max_classes_num=15, min_images_num=40, max_images_num=2000, allow_reshape = True):
         '''
             input_shape: input shape (height, width)
             min_images_num: min image number in one class
@@ -109,7 +109,7 @@ class Classifier(Train_Base):
                 
     def train(self, epochs= 100,
                     progress_cb=None,
-                    weights=os.path.join(curr_file_dir, "weights", "mobilenet_7_5_224_tf_no_top.h5"),
+                    weights=os.path.join(curr_file_dir, "weights", "mobilenet_v1_base_5.h5"),
                     batch_size = 5
                     ):
         self.log.i("train, labels:{}".format(self.labels))
@@ -120,7 +120,7 @@ class Classifier(Train_Base):
 
         # pooling='avg', use around padding instead padding bottom and right for k210
         base_model = mobilenet.MobileNet0(input_shape=self.input_shape,
-                     alpha = 0.75, depth_multiplier = 1, dropout = 0.001, pooling='avg',
+                     alpha = 0.5, depth_multiplier = 1, dropout = 0.001, pooling='avg',
                      weights=weights, include_top=False)
         # update top layer
         out = base_model.output
@@ -253,7 +253,6 @@ class Classifier(Train_Base):
 
     def save(self, h5_path=None, tflite_path=None):
         if h5_path:
-            self.log.i("save model as .h5 file")
             if not h5_path.endswith(".h5"):
                 if os.path.isdir(h5_path):
                     h5_path = os.path.join(h5_path, "classifier.h5")
@@ -261,6 +260,7 @@ class Classifier(Train_Base):
                     h5_path += ".h5"
             if not self.model:
                 raise Exception("no model defined")
+            self.log.i(f"save model as .h5 file:{h5_path}")
             self.model.save(h5_path)
         if tflite_path:
             self.log.i("save model as .tflite file")

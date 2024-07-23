@@ -47,7 +47,7 @@ def is_gpu_exist(create_sub_process=True):
     else:
         return func0()
 
-def select_gpu(memory_require=128*1024*1024, tf_gpu_mem_growth=False, logger=None, console=True, create_sub_process=True):
+def select_gpu(memory_require=128*1024*1024, tf_gpu_mem_growth=False, logger=None, console=True, create_sub_process=False):
     def func0(memory_require=128*1024*1024, tf_gpu_mem_growth=False, logger=None, console=True):
         try:
             gpu = None
@@ -74,13 +74,13 @@ def select_gpu(memory_require=128*1024*1024, tf_gpu_mem_growth=False, logger=Non
                 h = pynvml.nvmlDeviceGetHandleByIndex(i)
                 name = pynvml.nvmlDeviceGetName(h)
                 info = pynvml.nvmlDeviceGetMemoryInfo(h)
-                msg = "GPU:{}, used:{}/{}MB, free:{}MB".format(name.decode(), info.used/1024/1024, info.total/1024/1024, info.free/1024/1024)
+                msg = "GPU:{}, used:{}/{}MB, free:{}MB".format(name, info.used/1024/1024, info.total/1024/1024, info.free/1024/1024)
                 if logger:
                     logger.i(msg)
                 if console:
                     print(msg)
                 if info.free >= memory_require:
-                    gpu = GPU_info(id = i, name = name.decode(), mem_free = info.free, mem_total = info.total)
+                    gpu = GPU_info(id = i, name = name, mem_free = info.free, mem_total = info.total)
                     os.environ["CUDA_VISIBLE_DEVICES"] = str(i)
                     import tensorflow as tf
                     tf.config.experimental.set_memory_growth(gpus[i], True)

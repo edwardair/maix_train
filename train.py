@@ -1,6 +1,8 @@
 #!python3
 
 import argparse, os, sys, shutil
+from datetime import datetime
+import time
 
 
 def main():
@@ -44,10 +46,18 @@ def main():
     if not is_zip  and not os.path.exists(args.datasets):
         print("[ERROR] arg -d or -z is essential")
         return -1
+    out = args.out
+    if os.path.abspath(out) == os.path.abspath(os.path.join(os.path.dirname(__file__), 'out')):
+        datasets_name = ""
+        if is_zip:
+            datasets_name = os.path.splitext(os.path.basename(args.zip))[0]
+        else:
+            datasets_name = os.path.basename(args.datasets)
+        out = os.path.join(out, datasets_name,datetime.strftime(datetime.now(), '%Y%m%d-%H%M%S'))
     if args.type == "classifier":
-        train_task = Train(TrainType.CLASSIFIER,  args.zip, args.datasets, args.out)
+        train_task = Train(TrainType.CLASSIFIER,  args.zip, args.datasets, out)
     elif args.type == "detector":
-        train_task = Train(TrainType.DETECTOR,  args.zip, args.datasets, args.out)
+        train_task = Train(TrainType.DETECTOR,  args.zip, args.datasets, out)
     else:
         print("[ERROR] train type not support only support: {}".format(", ".join(supported_types)))
     train_task.train()
